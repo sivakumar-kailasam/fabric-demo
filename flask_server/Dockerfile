@@ -1,30 +1,17 @@
-FROM python:2.7
+FROM ubuntu:12.04
 
-#RUN apt-get -y update && \
-    #apt-get -y install openssh-server && \
-    #mkdir -p ~root/.ssh && chmod 700 ~root/.ssh/ && \
-    #echo -e "Port 22\n" >> /etc/ssh/sshd_config && \
-    #cp -a /etc/ssh /etc/ssh.cache && \
-    #rm -rf /var/cache/apt-get/*
+RUN apt-get update
+RUN apt-get install -y python-pip python-dev build-essential 
+RUN apt-get install -y wget ssh
+RUN apt-get install -y openssh-server 
+RUN mkdir /var/run/sshd 
 
+RUN mkdir /code
+WORKDIR /code
 RUN wget https://raw.githubusercontent.com/sivakumar-kailasam/fabric-demo/master/code/app.py
-#RUN mkdir -p /root/.ssh && \
-	#chmod 700 /root/.ssh
 
-#COPY entry.sh /ssh-daemon.sh
-
-RUN useradd -ms /bin/bash app-server
-USER app-server 
-WORKDIR /home/app-server
-
-
-#ENTRYPOINT ["/ssh-daemon.sh"]
-
-EXPOSE 8080 
-EXPOSE 2222
-EXPOSE 22
-
+RUN echo 'root:screencast' | chpasswd
 
 RUN pip install Flask --user
-#CMD ["/usr/sbin/sshd", "-D", "-f", "/etc/ssh/sshd_config"]
-CMD ["/bin/bash"]
+EXPOSE 22
+CMD    /usr/sbin/sshd -D
